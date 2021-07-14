@@ -1,0 +1,9 @@
+{
+  "domain": "signal_dbus",
+  "name": "Signal DBus",
+  "documentation": "https://github.com/braveheuel/signal_dbus",
+  "codeowners": ["@cheuel"],
+  "requirements": ["dbus-python==1.2.16"],
+  "version": "0.1",
+  "iot_class": "local_polling"
+}
