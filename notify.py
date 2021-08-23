@@ -45,8 +45,10 @@ def parse_text_bold(inp):
     print(m)
     if m:
         print(m[3])
-        bold_txt = "" if m[3] is None else m[3].translate(bold_trans)
-        return "".join(["".join(m[1]), " ", bold_txt, " ", parse_text_bold(m[5])])
+        bold_txt = "" if m[3] is None else m[3].translate(
+            bold_trans)
+        return "".join(["".join(m[1]), " ", bold_txt,
+                        " ", parse_text_bold(m[5])])
     else:
         return inp
 
@@ -54,8 +56,10 @@ def parse_text_bold(inp):
 def parse_text_italic(inp):
     m = italic_re.match(inp)
     if m:
-        italic_txt = "" if m[3] is None else m[3].translate(italic_trans)
-        return "".join(["".join(m[1]), " ", italic_txt, " ", parse_text_italic(m[5])])
+        italic_txt = "" if m[3] is None else m[3].translate(
+            italic_trans)
+        return "".join(["".join(m[1]), " ", italic_txt,
+                        " ", parse_text_italic(m[5])])
     else:
         return inp
 
@@ -76,6 +80,9 @@ class SignalNotificationService(BaseNotificationService):
 
         Additionally a file can be attached.
         """
+
+        if "title" in kwargs:
+            message = f" *{kwargs['title']}* \n{message}"
 
         message = parse_text_italic(parse_text_bold(message))
 
