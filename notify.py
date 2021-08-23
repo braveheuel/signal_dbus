@@ -82,7 +82,7 @@ class SignalNotificationService(BaseNotificationService):
         """
 
         if "title" in kwargs:
-            message = f" *{kwargs['title']}* \n{message}"
+            message = "".join([f" *{kwargs['title']}* \n", message])
 
         message = parse_text_italic(parse_text_bold(message))
 
