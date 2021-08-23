@@ -3,6 +3,7 @@ import logging
 
 import dbus
 import voluptuous as vol
+import re
 
 from homeassistant.components.notify import (
     ATTR_DATA,
@@ -22,6 +23,14 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     }
 )
 
+bold_re = re.compile(r'(.*?)(\ \*)([a-zA-Z0-9 _+]+)*(\*\ ?)(.*)')
+italic_re = re.compile(r'(.*?)(\ _)([a-zA-Z0-9 _+]+)*(_\ ?)(.*)')
+
+bold_trans = "Test".maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+                              "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵")
+italic_trans = "Test".maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+                                "𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧0123456789")
+
 
 def get_service(hass, config, discovery_info=None):
     """Get the SignalMessenger notification service."""
@@ -29,6 +38,26 @@ def get_service(hass, config, discovery_info=None):
     recp_nrs = config[CONF_RECP_NR]
 
     return SignalNotificationService(recp_nrs)
+
+
+def parse_text_bold(inp):
+    m = bold_re.match(inp)
+    print(m)
+    if m:
+        print(m[3])
+        bold_txt = "" if m[3] is None else m[3].translate(bold_trans)
+        return "".join(["".join(m[1]), " ", bold_txt, " ", parse_text_bold(m[5])])
+    else:
+        return inp
+
+
+def parse_text_italic(inp):
+    m = italic_re.match(inp)
+    if m:
+        italic_txt = "" if m[3] is None else m[3].translate(italic_trans)
+        return "".join(["".join(m[1]), " ", italic_txt, " ", parse_text_italic(m[5])])
+    else:
+        return inp
 
 
 class SignalNotificationService(BaseNotificationService):
@@ -48,6 +77,8 @@ class SignalNotificationService(BaseNotificationService):
         Additionally a file can be attached.
         """
 
+        message = parse_text_italic(parse_text_bold(message))
+
         _LOGGER.debug("Sending signal message")
 
         data = kwargs.get(ATTR_DATA)
@@ -58,7 +89,9 @@ class SignalNotificationService(BaseNotificationService):
                 filenames = data[ATTR_FILENAMES]
 
         try:
-            self.proxy.sendMessage(message, dbus.Array(), self._recp_nrs, dbus_interface="org.asamk.Signal")
+            self.proxy.sendMessage(message, dbus.Array(),
+                                   self._recp_nrs,
+                                   dbus_interface="org.asamk.Signal")
         except Exception as ex:
             _LOGGER.error("%s", ex)
             raise ex
