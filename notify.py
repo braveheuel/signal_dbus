@@ -42,9 +42,7 @@ def get_service(hass, config, discovery_info=None):
 
 def parse_text_bold(inp):
     m = bold_re.match(inp)
-    print(m)
     if m:
-        print(m[3])
         bold_txt = "" if m[3] is None else m[3].translate(
             bold_trans)
         return "".join(["".join(m[1]), " ", bold_txt,
@@ -82,7 +80,7 @@ class SignalNotificationService(BaseNotificationService):
         """
 
         if "title" in kwargs:
-            message = "".join([f" *{kwargs['title']}* \n", message])
+            message = "".join([f"*{kwargs['title']}*\n", message])
 
         message = parse_text_italic(parse_text_bold(message))
 
