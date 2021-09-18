@@ -24,7 +24,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 )
 
 bold_re = re.compile(r'(.*?)(\s*)\*([a-zA-ZäÄöÖüÜ0-9 _+/\\-°,;:]+)\*(\s*)(.*)', re.DOTALL)
-italic_re = re.compile(r'(.*?)(\s*)_([a-zA-ZäÄöÖüÜ0-9 _+/\\-°]+,;:)_(\s*)(.*)', re.DOTALL)
+italic_re = re.compile(r'(.*?)(\s*)_([a-zA-ZäÄöÖüÜ0-9 _+/\\-°,;:]+)_(\s*)(.*)', re.DOTALL)
 
 bold_trans = "Test".maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
                               "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵")
@@ -94,9 +94,10 @@ class SignalNotificationService(BaseNotificationService):
                 filenames = data[ATTR_FILENAMES]
 
         try:
-            self.proxy.sendMessage(message, dbus.Array(),
-                                   self._recp_nrs,
-                                   dbus_interface="org.asamk.Signal")
+            for i in self._recp_nrs:
+                self.proxy.sendMessage(message, dbus.Array(),
+                                       i,
+                                       dbus_interface="org.asamk.Signal")
         except Exception as ex:
             _LOGGER.error("%s", ex)
             raise ex
