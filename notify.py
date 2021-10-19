@@ -95,7 +95,7 @@ class SignalNotificationService(BaseNotificationService):
 
         try:
             for i in self._recp_nrs:
-                self.proxy.sendMessage(message, dbus.Array(),
+                self.proxy.sendMessage(message, [],
                                        i,
                                        dbus_interface="org.asamk.Signal")
         except Exception as ex:
