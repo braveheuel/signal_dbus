@@ -97,7 +97,8 @@ class SignalNotificationService(BaseNotificationService):
             for i in self._recp_nrs:
                 self.proxy.sendMessage(message, [],
                                        i,
-                                       dbus_interface="org.asamk.Signal")
+                                       dbus_interface="org.asamk.Signal",
+                                       signature="sass")
         except Exception as ex:
             _LOGGER.error("%s", ex)
             raise ex
